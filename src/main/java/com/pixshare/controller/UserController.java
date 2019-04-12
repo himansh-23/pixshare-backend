@@ -82,10 +82,12 @@ public class UserController {
 	@PostMapping("/resetpage/{token}")
 	public ResponseEntity<?> resetPage(@PathVariable String token,HttpServletRequest servletRequest)throws UserException
 	{
+		System.out.println(token);
 		userService.resetPage(token, servletRequest);	
+		
 		Response response=new Response(200,"Password Change Link Send TO Your Mail");
 		log.info("Response Send {}",response);
-		return new ResponseEntity<>(response,HttpStatus.OK);
+		return new ResponseEntity<Response>(response,HttpStatus.OK);
 	}
 	
 	@PostMapping("/updatepassword/{token}")

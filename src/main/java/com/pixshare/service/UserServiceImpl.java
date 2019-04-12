@@ -116,9 +116,7 @@ public class UserServiceImpl implements UserService {
 		if(userDetails.isPresent())  {
 			String requestBy=servletRequest.getRequestURL().toString();
 			 requestBy=requestBy.substring(0,requestBy.length()-14)+"resetpage/";
-			 requestBy += JwtToken.generateToken(userDetails.get().getId());
-			 
-			 EmailUtility.sendEmail(userDetails.get().getEmail(), "Password Recovery", "Click On below link \n "+requestBy);
+			 rabbitTemplate.convertAndSend(AppConfiguration.exchangeForEmail, "", new Email(userDetails.get(),"Password Recovery","Click On below link",requestBy));
 			 return true;
 		}
 		else {
@@ -129,11 +127,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void resetPage(String token, HttpServletRequest servletRequest) throws UserException {
 		Long id=JwtToken.verifyToken(token);
-		UserDetails user=userRepository.findById(id).get();
+		UserDetails userDetails=userRepository.findById(id).get();
 		String requestBy=getUrl(servletRequest);
 		requestBy=requestBy+"/updatepassword/";
-		requestBy+=JwtToken.generateToken(id);
-		EmailUtility.sendEmail(user.getEmail(), "Reset Page", "Click On below link \n "+requestBy);
+		rabbitTemplate.convertAndSend(AppConfiguration.exchangeForEmail, "", new Email(userDetails,"Reset Page","Click On below link",requestBy));
 	}
 
 	@Override
