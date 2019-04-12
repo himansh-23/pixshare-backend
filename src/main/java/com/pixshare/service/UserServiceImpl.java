@@ -5,10 +5,14 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.pixshare.AppConfiguration;
 import com.pixshare.dao.UserRepository;
+import com.pixshare.dto.Email;
 import com.pixshare.dto.UserLogin;
 import com.pixshare.dto.UserRegister;
 import com.pixshare.entity.UserDetails;
@@ -28,17 +32,17 @@ public class UserServiceImpl implements UserService {
 	ModelMapper modelMapper;
 	@Autowired
 	PasswordEncoder passwordEncoder;
+	@Autowired
+	RabbitTemplate rabbitTemplate;
 	
 	@Override
 	public void regiseter(UserRegister userRegister,HttpServletRequest servletRequest) throws UserException {
 		UserDetails userDetails=modelMapper.map(userRegister, UserDetails.class);
 		userDetails.setPassword(passwordEncoder.encode(userRegister.getPassword()));
 		 userDetails=userRepository.save(userDetails);
-		 String token=JwtToken.generateToken(userDetails.getId());
 		 String requestBy=servletRequest.getRequestURL().toString();
 		 requestBy=requestBy.substring(0,requestBy.length()-8)+"verify/";
-		
-		EmailUtility.sendEmail(userRegister.getEmail(), "Email Verification Link", "please Verify Your Email"+"\n"+requestBy+token);
+		 rabbitTemplate.convertAndSend(AppConfiguration.exchangeForEmail, "", new Email(userDetails,"Email Verification Link","please Verify Your Email",requestBy));
 		log.info("email send");
 	}
 
