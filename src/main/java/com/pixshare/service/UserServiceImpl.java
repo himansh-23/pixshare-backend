@@ -61,11 +61,11 @@ public class UserServiceImpl implements UserService {
 						   return null;
 					   })
 					   .orElseThrow(() ->new UserException(123, "Check Your Email And Password"));
+
 				}
 	
 	private Optional<Boolean> validUser(UserDetails userDetails,String password) throws UserException
 	{
-		System.out.println("xyz");
 		if(!userDetails.isAuthenticated())
 		{
 			return Optional.empty();
