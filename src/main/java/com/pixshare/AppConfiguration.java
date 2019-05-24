@@ -16,7 +16,6 @@ import org.springframework.amqp.core.FanoutExchange;
 
 
 @Configuration
-@EnableRabbit
 public class AppConfiguration {
 	
 	public static String exchangeForEmail="emailexchange";
