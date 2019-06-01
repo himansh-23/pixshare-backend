@@ -49,39 +49,45 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void login(UserLogin userLogin) throws UserException {
 
-		userRepository.findByEmail(userLogin.getEmail())
-					   .map(userDetails -> 
-					   {
-						   try {   
-							   return this.validUser(userDetails, userLogin.getPassword());
-						   }catch(UserException e)
-						   {
-							   new UserException(123, "Check Your Email And Password");
-						   }
-						   return null;
-					   })
-					   .orElseThrow(() ->new UserException(123, "Check Your Email And Password"));
+		Optional<UserDetails> userDetails=userRepository.findByEmail(userLogin.getEmail());
 
+		if(userDetails.isPresent()){
+			if(!userDetails.get().isAuthenticated())
+				{
+					throw new UserException(123, "User Not Auth.");
+				}
+			boolean checkPassword=passwordEncoder.matches(userLogin.getPassword(), userDetails.get().getPassword());
+
+			if(!checkPassword){
+				throw new UserException(123, "Invalid Password");
+			}
+
+		}
+		else {
+			throw new UserException(123,"user Not Found");
+		}
+//		userRepository.findByEmail(userLogin.getEmail())
+//						.map( userDetails -> {
+//							if(userDetails.isAuthenticated()){
+//
+//							}
+//							else {
+//								throw new UserException(123, "User Not Auth.");
+//							} throws UserException;
+//						}).orElseThrow(() -> new UserException(123,"user Not Found"));
 				}
 	
-	private Optional<Boolean> validUser(UserDetails userDetails,String password) throws UserException
-	{
-		if(!userDetails.isAuthenticated())
-		{
-			return Optional.empty();
-		}
-		System.out.println(password +"   "+ userDetails.getPassword());
-		boolean b=passwordEncoder.matches(password, userDetails.getPassword());
-		if(b)
-		{
-			return Optional.of(true);
-		}
-		else
-		{
-			throw new UserException(123, "Invalid Password");
-		}
-		
-	}
+//	private void validUser(UserDetails userDetails,String password) throws UserException
+//	{
+//		if(!userDetails.isAuthenticated())
+//		{
+//			throw new UserException(123, "User Not Auth.");
+//		}
+//		System.out.println(password +"   "+ userDetails.getPassword());
+//		boolean b=passwordEncoder.matches(password, userDetails.getPassword());
+//		if(!b){
+//			throw new UserException(123, "Invalid Password");}
+//	}
 
 	@Override
 	public void forgotPassword(String email) throws UserException {
