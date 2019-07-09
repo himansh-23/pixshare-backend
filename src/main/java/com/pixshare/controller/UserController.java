@@ -1,12 +1,14 @@
 package com.pixshare.controller;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/user/api")
 @Slf4j
+@CrossOrigin(origins="*",exposedHeaders="jwttoken")
 public class UserController {
 
 	@Autowired
@@ -52,9 +55,10 @@ public class UserController {
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<?> loginUser(@RequestBody UserLogin userLogin) throws UserException
+	public ResponseEntity<?> loginUser(@RequestBody UserLogin userLogin, HttpServletResponse hresponse) throws UserException
 	{
 		userService.login(userLogin);
+		hresponse.addHeader("jwttoken","jkdgjsgjier");
 		Response response=new Response(200,"User Successfully Login");
 		log.info("Response Send {}",response);
 		return new ResponseEntity<Response>(response, HttpStatus.OK);

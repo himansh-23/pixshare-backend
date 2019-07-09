@@ -72,6 +72,30 @@
 			<artifactId>java-jwt</artifactId>
 			<version>3.2.0</version>
 		</dependency>
+		
+		<!-- Swagger Dependencies for api test -->
+		
+		<dependency>
+		 <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger2</artifactId>
+    <version>2.6.1</version>
+		</dependency>
+		
+		
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger-ui</artifactId>
+    <version>2.6.1</version>
+    <scope>compile</scope>
+</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-io -->
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-io</artifactId>
+    <version>1.3.2</version>
+</dependency>
+		
 
 	</dependencies>
 
