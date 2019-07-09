@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
 		 userDetails=userRepository.save(userDetails);
 		 String requestBy=servletRequest.getRequestURL().toString();
 		 requestBy=requestBy.substring(0,requestBy.length()-8)+"verify/";
-		 rabbitTemplate.convertAndSend(AppConfiguration.exchangeForEmail, "", new Email(userDetails,"Email Verification Link","please Verify Your Email",requestBy));
+		 rabbitTemplate.convertAndSend(AppConfiguration.exchangeForEmail, "", new Email(userDetails,"Email Verification Link ","please Verify Your Email",requestBy));
 		log.info("email send");
 	}
 
