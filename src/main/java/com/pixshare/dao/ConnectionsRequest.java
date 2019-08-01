@@ -1,5 +1,6 @@
 package com.pixshare.dao;
 
+<<<<<<< HEAD
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,13 @@ public interface ConnectionsRequest extends JpaRepository<PendingConnectionReque
 	Optional<Long> findByRequestId(@Param("fromId")long fromId,@Param("toId")long toId);
 	
 	List<PendingConnectionRequest> findAllByFromId(Long id);
+=======
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.pixshare.entity.PendingConnectionRequest;
+
+public interface ConnectionsRequest extends JpaRepository<PendingConnectionRequest, Long>{
+	
+	
+>>>>>>> 21d132bece26e620e27d92953d72f53070708004
 }
