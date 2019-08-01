@@ -79,7 +79,7 @@ public class AppConfiguration {
 		 return new Docket(DocumentationType.SWAGGER_2)
 				 .select()
 				 .apis(RequestHandlerSelectors.basePackage("com.pixshare.controller"))
-				 .paths(regex("/user/api.*"))
+				 .paths(regex("/user/api.*")) //or PathSelector.any()
 				 .build();
 	 }
 
