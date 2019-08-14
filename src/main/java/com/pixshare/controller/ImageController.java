@@ -2,34 +2,25 @@ package com.pixshare.controller;
 
 import com.pixshare.dao.ConnectionsRequest;
 import com.pixshare.dao.ImageRepository;
-<<<<<<< HEAD
+
 import com.pixshare.dao.PersonConnections;
 import com.pixshare.dao.UserRepository;
 import com.pixshare.dto.UserInfo;
 import com.pixshare.entity.Connections;
-=======
-import com.pixshare.dao.UserRepository;
->>>>>>> 21d132bece26e620e27d92953d72f53070708004
 import com.pixshare.entity.ImageDetails;
 import com.pixshare.entity.PendingConnectionRequest;
 import com.pixshare.entity.UserDetails;
 import com.pixshare.response.Response;
 import lombok.extern.slf4j.Slf4j;
 
-<<<<<<< HEAD
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-=======
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.ServerProperties.Tomcat.Resource;
->>>>>>> 21d132bece26e620e27d92953d72f53070708004
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-<<<<<<< HEAD
+
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -37,8 +28,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-=======
->>>>>>> 21d132bece26e620e27d92953d72f53070708004
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,7 +47,6 @@ public class ImageController {
 
 	@Autowired
 	ImageRepository imageRepository;
-<<<<<<< HEAD
 
 	@Autowired
 	UserRepository userRepository;
@@ -165,56 +153,5 @@ public class ImageController {
 		return penRequest.getToId(); 
 	}
 	
-=======
-	
-	@Autowired
-	UserRepository userRepository;
-	
-	@Autowired
-	ConnectionsRequest connectionRequest;
-	
-    @PostMapping(value = "/addimage",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Response> addImage(@RequestParam("image") MultipartFile image,@RequestParam Long userId)  {
-        try {
-            FileOutputStream fos = new FileOutputStream("/home/user/Desktop/images/" + image.getOriginalFilename());
-            UserDetails userDetails = userRepository.findById(userId).get();
-            ImageDetails imageDetails=new ImageDetails();
-            imageDetails.setAuthor(userDetails.getEmail());
-            imageDetails.setImageName(image.getOriginalFilename());
-            fos.write(image.getBytes());
-            fos.close();
-            imageRepository.save(imageDetails);
-        }
-        catch(IOException e)
-        {
-        log.error("error",e);
-        }
-        Response response = new Response(200,"Image Uploaded");
-        return new ResponseEntity<Response>(response,HttpStatus.OK);
-    }
 
-    @GetMapping(value = "/userimages",produces = MediaType.ALL_VALUE)
-    public ResponseEntity<List<Resource>> getImages(@RequestParam Long id){
-    	
-    	return null;
-    }
-    
-    @PostMapping("/createconnection")
-    public ResponseEntity<Response> createConnection(@RequestParam Long userId,@RequestParam Long connectionId){
-    	
-    	PendingConnectionRequest newConnectionRequest=new PendingConnectionRequest();
-    	newConnectionRequest.setFromId(userId);
-    	newConnectionRequest.setToId(connectionId);
-    	connectionRequest.save(newConnectionRequest);
-    	
-    	 Response response = new Response(200,"Connection Request Send");
-         return new ResponseEntity<Response>(response,HttpStatus.OK);
-    }
-    
-    @PostMapping("/responseconnection")
-    public ResponseEntity<Response> responseConnection(@RequestParam Long userId,@RequestParam Long whoSendRequest,@RequestParam Boolean response){
-    
-    return null;
-    }
->>>>>>> 21d132bece26e620e27d92953d72f53070708004
 }
