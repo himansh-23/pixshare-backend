@@ -144,6 +144,19 @@ public class ImageController {
 		return userRepository.findByIdNotIn(followUser, page).stream().map(value -> modelMapper.map(value, UserInfo.class)).collect(Collectors.toList());
 	}
 	
+	@GetMapping("/followers")
+		public List<UserInfo> followers(@RequestParam Long userId,Pageable page){
+			
+			List<Connections> followers = personConnection.findAllBySourceUser(userId);
+			List<Long> ll = followers.stream().map(value -> value.getConnectedUser()).collect(Collectors.toList());
+			List<UserDetails> follower = userRepository.findAllById(ll);
+			List<UserInfo> ss=new ArrayList<>();
+			followers.stream().forEach( value ->
+			
+			ss.add(modelMapper.map(value, UserInfo.class));
+			
+	}
+	
 	private Long returnOnlyIds(Connections connection) {
 		
 		return connection.getConnectedUser();
