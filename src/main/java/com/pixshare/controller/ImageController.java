@@ -46,20 +46,20 @@ import java.util.stream.Collectors;
 public class ImageController {
 
 	@Autowired
-	ImageRepository imageRepository;
+	private ImageRepository imageRepository;
 
 	@Autowired
-	UserRepository userRepository;
+	private UserRepository userRepository;
 
 	@Autowired
-	ConnectionsRequest connectionRequest;
+	private ConnectionsRequest connectionRequest;
 
 	@Autowired
-	PersonConnections personConnection;
+	private PersonConnections personConnection;
 	
 	
 	@Autowired
-	ModelMapper modelMapper;
+	private ModelMapper modelMapper;
 
 	private final Path rootLocation = Paths.get("/home/user/Desktop/images");
 
@@ -112,10 +112,10 @@ public class ImageController {
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}
 
-	@PostMapping("/responseconnection")
+	@GetMapping("/responseconnection")
 	public ResponseEntity<Response> responseConnection(@RequestParam Long userId, @RequestParam Long whoSendRequest,
 			@RequestParam Boolean response) {
-		System.out.println(response.booleanValue() + " " + userId);
+		log.info(response + " " + userId);
 		if (response.booleanValue()) {
 			Connections conn = new Connections();
 			conn.setSourceUser(whoSendRequest);
@@ -136,8 +136,9 @@ public class ImageController {
 	@GetMapping("/follwingsuggestion")
 	public List<UserInfo> followingSuggestion(@RequestParam Long userId,Pageable page){
 		System.out.println(page);
-		List<Long> followUser=personConnection.findAllBySourceUser(userId).stream().map(value ->returnOnlyIds(value)).collect(Collectors.toList());
-		List<Long> addUser=connectionRequest.findAllByFromId(userId).stream().map(value -> OnlyIdsfromPendingConnection(value)).collect(Collectors.toList());
+		log.info(String.valueOf(userId));
+		List<Long> followUser=personConnection.findAllBySourceUser(userId).stream().map(this::returnOnlyIds).collect(Collectors.toList());
+		List<Long> addUser=connectionRequest.findAllByFromId(userId).stream().map(this::OnlyIdsfromPendingConnection).collect(Collectors.toList());
 		followUser.add(userId);
 		followUser.addAll(addUser);
 		System.out.println(followUser);
@@ -146,15 +147,15 @@ public class ImageController {
 	
 	@GetMapping("/followers")
 		public List<UserInfo> followers(@RequestParam Long userId,Pageable page){
-			
+
 			List<Connections> followers = personConnection.findAllBySourceUser(userId);
-			List<Long> ll = followers.stream().map(value -> value.getConnectedUser()).collect(Collectors.toList());
+			List<Long> ll = followers.stream().map(Connections::getConnectedUser).collect(Collectors.toList());
 			List<UserDetails> follower = userRepository.findAllById(ll);
 			List<UserInfo> ss=new ArrayList<>();
-			followers.stream().forEach( value ->
-			
-			ss.add(modelMapper.map(value, UserInfo.class));
-			
+			follower.forEach( value ->
+			ss.add(modelMapper.map(value, UserInfo.class)));
+
+			return ss;
 	}
 	
 	private Long returnOnlyIds(Connections connection) {
