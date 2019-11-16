@@ -16,5 +16,6 @@ public interface ConnectionsRequest extends JpaRepository<PendingConnectionReque
 	
 	List<PendingConnectionRequest> findAllByFromId(Long id);
 	
+	List<PendingConnectionRequest> findAllByToId(Long id);
 
 }

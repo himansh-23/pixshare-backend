@@ -5,6 +5,7 @@ import com.pixshare.dao.ImageRepository;
 
 import com.pixshare.dao.PersonConnections;
 import com.pixshare.dao.UserRepository;
+import com.pixshare.dto.ImageDescription;
 import com.pixshare.dto.UserInfo;
 import com.pixshare.entity.Connections;
 import com.pixshare.entity.ImageDetails;
@@ -37,6 +38,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -64,12 +66,15 @@ public class ImageController {
 	private final Path rootLocation = Paths.get("/home/user/Desktop/images");
 
 	@PostMapping(value = "/addimage")
-	public ResponseEntity<Response> addImage(@RequestParam("image") MultipartFile image, @RequestParam Long userId) {
+	public ResponseEntity<Response> addImage(@RequestParam("image") MultipartFile image, @RequestParam Long userId,@RequestParam String location,@RequestParam String description) {
 		try {
 			FileOutputStream fos = new FileOutputStream("/home/user/Desktop/images/" + image.getOriginalFilename());
 			UserDetails userDetails = userRepository.findById(userId).get();
 			ImageDetails imageDetails = new ImageDetails();
 			imageDetails.setAuthor(userDetails.getEmail());
+			System.out.println(UUID.randomUUID().toString());
+			imageDetails.setLocation(location);
+			imageDetails.setDescription(description);
 			imageDetails.setImageName(image.getOriginalFilename());
 			fos.write(image.getBytes());
 			fos.close();
@@ -82,13 +87,16 @@ public class ImageController {
 	}
 
 	@GetMapping(value = "/userimages")
-	public ResponseEntity<List<String>> getImagesMetaData(@RequestParam Long id) {
-		List<Connections> listOfConnectedUser = personConnection.findAll();
+	public ResponseEntity<List<ImageDescription>> getImagesMetaData(@RequestParam Long id) {
+		List<Connections> listOfConnectedUser = personConnection.findAllBySourceUser(id);
 		List<Long> idOfUsersList = listOfConnectedUser.stream().map(i -> i.getConnectedUser())
 				.collect(Collectors.toList());
+		
 		List<String> listofEmails = userRepository.findAllById(idOfUsersList).stream().map(i -> i.getEmail())
 				.collect(Collectors.toList());
-		List<String> listofImageName = imageRepository.findAllByAuthor(listofEmails).stream().map(i -> i.getImageName())
+		log.info(listofEmails+"");
+		
+		List<ImageDescription> listofImageName = imageRepository.findAllByAuthorIn(listofEmails).stream().map(i -> modelMapper.map(i,ImageDescription.class)) //i.getImageName()
 				.collect(Collectors.toList());
 		return ResponseEntity.ok(listofImageName);
 		
@@ -154,8 +162,18 @@ public class ImageController {
 			List<UserInfo> ss=new ArrayList<>();
 			follower.forEach( value ->
 			ss.add(modelMapper.map(value, UserInfo.class)));
-
 			return ss;
+	}
+	
+	@GetMapping("/following")
+	public List<UserInfo> following(@RequestParam Long userId,Pageable page){
+		
+		List<Connections> following =personConnection.findAllByConnectedUser(userId);
+		List<Long> ids=following.stream().map(Connections::getSourceUser).collect(Collectors.toList());
+		List<UserDetails> aa=userRepository.findAllById(ids);
+		List<UserInfo> ss=new ArrayList<>();
+		aa.forEach(value -> ss.add(modelMapper.map(value, UserInfo.class)));
+		return ss;				
 	}
 	
 	private Long returnOnlyIds(Connections connection) {
@@ -167,5 +185,21 @@ public class ImageController {
 		return penRequest.getToId(); 
 	}
 	
-
+	@GetMapping("/personalImage")
+	public ResponseEntity<List<ImageDescription>> getPersonalImageMetaData(@RequestParam Long userId ) throws Exception {
+		
+		String email=userRepository.findById(userId).map(user ->user.getEmail()).orElseThrow(Exception::new);
+		List<ImageDescription> list=imageRepository.findAllByAuthor(email).stream().map(image -> modelMapper.map(image,ImageDescription.class)).collect(Collectors.toList());
+		return ResponseEntity.ok().body(list);	
+	}
+	
+	@GetMapping("/getFollowRequests")
+	public List<UserInfo>  followRequests(@RequestParam Long userId){
+		
+	List<Long> users=connectionRequest.findAllByToId(userId).stream().map(PendingConnectionRequest::getFromId).collect(Collectors.toList());
+	log.info("get followers"+users);
+	List<UserInfo> findUsers=userRepository.findAllById(users).stream().map(value -> modelMapper.map(value,UserInfo.class)).collect(Collectors.toList());
+	
+	return findUsers;	
+	}
 }

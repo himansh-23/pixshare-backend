@@ -21,13 +21,14 @@ import com.pixshare.dto.UserRegister;
 import com.pixshare.exception.UserException;
 import com.pixshare.response.Response;
 import com.pixshare.service.UserService;
+import com.pixshare.utils.JwtToken;
 
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/user/api")
 @Slf4j
-@CrossOrigin(origins="*",exposedHeaders="jwttoken")
+//@CrossOrigin(origins="*",exposedHeaders= {"access-token","Id"})
 public class UserController {
 
 	@Autowired
@@ -37,7 +38,7 @@ public class UserController {
 	public ResponseEntity<?> etc()
 	{
 		Response response=new Response(200,"Welcome");
-		return new ResponseEntity<Response>(response, HttpStatus.OK);
+		return new ResponseEntity<Response>(response, HttpStatus.NOT_FOUND);
 	}
 	
 	@PostMapping("/register")
@@ -57,8 +58,9 @@ public class UserController {
 	@PostMapping("/login")
 	public ResponseEntity<?> loginUser(@RequestBody UserLogin userLogin, HttpServletResponse hresponse) throws UserException
 	{
-		userService.login(userLogin);
-		hresponse.addHeader("jwttoken","jkdgjsgjier");
+		Long id=userService.login(userLogin);
+		hresponse.addHeader("access-token",JwtToken.generateToken(id));
+		hresponse.addHeader("Id",id+"");
 		Response response=new Response(200,"User Successfully Login");
 		log.info("Response Send {}",response);
 		return new ResponseEntity<Response>(response, HttpStatus.OK);

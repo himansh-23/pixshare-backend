@@ -10,6 +10,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -23,7 +27,8 @@ import static springfox.documentation.builders.PathSelectors.regex;
 
 @Configuration
 @EnableSwagger2
-public class AppConfiguration {
+@EnableWebMvc
+public class AppConfiguration implements WebMvcConfigurer {
 	
 	public static String exchangeForEmail="emailexchange";
 	public static String queueForEmail="emailqueue";
@@ -81,5 +86,15 @@ public class AppConfiguration {
 				 .paths(regex("/user/api.*")) //or PathSelector.any()
 				 .build();
 	 }
+	 
+	 @Override
+	    public void addCorsMappings(CorsRegistry registry) {
+	       registry
+	               .addMapping("*")
+	               .allowedMethods("OPTIONS", "GET", "PUT", "POST", "DELETE")
+	               .allowedOrigins("http://localhost:4200")
+	               .allowedHeaders("*");
+	       
+	    }
 
 }

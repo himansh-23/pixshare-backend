@@ -15,11 +15,14 @@ public class ImageDetails implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -6039810328544086259L;
+	
 	@Id
 	@GeneratedValue
 	private Long id;
 	
 	private String imageName;
 	private String author;
+	private String location;
+	private String description;
 
 }

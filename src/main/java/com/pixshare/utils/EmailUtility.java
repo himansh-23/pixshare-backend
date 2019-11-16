@@ -3,7 +3,6 @@ package com.pixshare.utils;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
-import org.springframework.beans.factory.annotation.Value;
 import com.pixshare.exception.UserException;
 
 import lombok.extern.slf4j.Slf4j;

@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void login(UserLogin userLogin) throws UserException {
+	public Long login(UserLogin userLogin) throws UserException {
 
 		Optional<UserDetails> userDetails=userRepository.findByEmail(userLogin.getEmail());
 
@@ -67,6 +67,8 @@ public class UserServiceImpl implements UserService {
 		else {
 			throw new UserException(123,"user Not Found");
 		}
+		
+		return userDetails.get().getId();
 //		userRepository.findByEmail(userLogin.getEmail())
 //						.map( userDetails -> {
 //							if(userDetails.isAuthenticated()){
